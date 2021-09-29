@@ -4,11 +4,11 @@ from fastapi import Depends, FastAPI, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from restapi.crud import crud_user
-from restapi.db.sqlite import SessionLocal, engine
-from restapi.exceptions import NotFoundError
-from restapi.models import user as UserModel
-from restapi.schemas.user import User, UserCreate, UserUpdate
+from .crud import crud_user
+from .db.sqlite import SessionLocal, engine
+from .exceptions import NotFoundError
+from .models import user as UserModel
+from .schemas.user import User, UserCreate, UserUpdate
 
 # https://stackoverflow.com/a/68383073
 UserModel.Base.metadata.create_all(bind=engine)
