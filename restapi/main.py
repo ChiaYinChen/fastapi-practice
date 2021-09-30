@@ -34,7 +34,7 @@ async def not_found_error_handler(request: Request, exc: NotFoundError):
 
 
 @app.get("/user/{username}", response_model=User)
-async def get_user(
+def get_user(
     username: str,
     db: Session = Depends(get_db)
 ):
@@ -55,7 +55,7 @@ def get_users(
 
 
 @app.post("/user/", response_model=User, status_code=201)
-async def create_user(
+def create_user(
     user: UserCreate,
     db: Session = Depends(get_db)
 ):
@@ -69,7 +69,7 @@ async def create_user(
 
 
 @app.patch("/user/{username}")
-async def update_user(
+def update_user(
     username: str,
     updates: UserUpdate,
     db: Session = Depends(get_db)
@@ -85,7 +85,7 @@ async def update_user(
 
 
 @app.delete("/user/{username}")
-async def delete_user(
+def delete_user(
     username: str,
     db: Session = Depends(get_db)
 ):
