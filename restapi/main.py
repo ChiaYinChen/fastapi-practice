@@ -5,7 +5,8 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from .crud import crud_user
-from .db.sqlite import SessionLocal, engine
+from .db.sqlite import engine
+from .dependencies import get_db
 from .exceptions import NotFoundError
 from .models import user as UserModel
 from .schemas.user import User, UserCreate, UserUpdate
@@ -14,15 +15,6 @@ from .schemas.user import User, UserCreate, UserUpdate
 UserModel.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @app.exception_handler(NotFoundError)
