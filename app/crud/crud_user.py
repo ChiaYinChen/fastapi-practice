@@ -1,50 +1,57 @@
+from typing import Any, Dict, Optional, Union
+
 from sqlalchemy.orm import Session
 
+from ..crud.base import CRUDBase
 from ..models.user import User as UserModel
 from ..schemas.user import UserCreate, UserInDB, UserUpdate
 
 
-def get_user_by_id(db: Session, user_id: int):
-    return db.query(UserModel).filter(UserModel.id == user_id).first()
+class CRUDUser(CRUDBase[UserModel, UserCreate, UserUpdate]):
+
+    def get_by_id(
+        self, db: Session, user_id: int
+    ) -> Optional[UserModel]:
+        return db.query(UserModel).filter(UserModel.id == user_id).first()
+
+    def get_by_username(
+        self, db: Session, username: str
+    ) -> Optional[UserModel]:
+        return db.query(UserModel).filter(UserModel.username == username).first()  # noqa: E501
+
+    def fake_password_hasher(self, raw_password: str) -> str:
+        return "supersecret" + raw_password
+
+    def create(self, db: Session, obj_in: UserCreate) -> UserModel:
+        hashed_password = self.fake_password_hasher(obj_in.password)
+        user_in_db = UserInDB(
+            **obj_in.dict(), hashed_password=hashed_password
+        )
+        db_obj = UserModel(**user_in_db.dict())
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
+    def update(
+        self,
+        db: Session,
+        db_obj: UserModel,
+        obj_in: Union[UserUpdate, Dict[str, Any]]
+    ) -> UserModel:
+        if isinstance(obj_in, dict):
+            update_data = obj_in
+        else:
+            update_data = obj_in.dict(exclude_unset=True)
+        if update_data.get("password"):
+            hashed_password = self.fake_password_hasher(update_data["password"])  # noqa: E501
+            del update_data["password"]
+            update_data["hashed_password"] = hashed_password
+        return super().update(db, db_obj=db_obj, obj_in=update_data)
 
 
-def get_user_by_username(db: Session, username: str):
-    return db.query(UserModel).filter(UserModel.username == username).first()
+user = CRUDUser(UserModel)
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(UserModel).offset(skip).limit(limit).all()
-
-
-def fake_password_hasher(raw_password: str):
-    return "supersecret" + raw_password
-
-
-def create_user(db: Session, user: UserCreate):
-    hashed_password = fake_password_hasher(user.password)
-    user_in_db = UserInDB(
-        **user.dict(), hashed_password=hashed_password
-    )
-    db_user = UserModel(**user_in_db.dict())
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-
-
-def update_user(db: Session, db_obj: UserModel, updates: UserUpdate):
-    update_data = updates.dict(exclude_unset=True)
-    if update_data.get("password"):
-        hashed_password = fake_password_hasher(update_data["password"])
-        del update_data["password"]
-        update_data["hashed_password"] = hashed_password
-    for key, value in update_data.items():
-        setattr(db_obj, key, value)
-    db.add(db_obj)
-    db.commit()
-    db.refresh(db_obj)
-
-
-def delete_user(db: Session, db_obj: UserModel):
-    db.delete(db_obj)
-    db.commit()
