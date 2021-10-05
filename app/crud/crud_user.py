@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional, Union
 
 from sqlalchemy.orm import Session
 
+from ..core.security import get_password_hash
 from ..crud.base import CRUDBase
 from ..models.user import User as UserModel
 from ..schemas.user import UserCreate, UserInDB, UserUpdate
@@ -19,11 +20,10 @@ class CRUDUser(CRUDBase[UserModel, UserCreate, UserUpdate]):
     ) -> Optional[UserModel]:
         return db.query(UserModel).filter(UserModel.username == username).first()  # noqa: E501
 
-    def fake_password_hasher(self, raw_password: str) -> str:
-        return "supersecret" + raw_password
-
-    def create(self, db: Session, obj_in: UserCreate) -> UserModel:
-        hashed_password = self.fake_password_hasher(obj_in.password)
+    def create(
+        self, db: Session, obj_in: UserCreate
+    ) -> UserModel:
+        hashed_password = get_password_hash(obj_in.password)
         user_in_db = UserInDB(
             **obj_in.dict(), hashed_password=hashed_password
         )
@@ -44,7 +44,7 @@ class CRUDUser(CRUDBase[UserModel, UserCreate, UserUpdate]):
         else:
             update_data = obj_in.dict(exclude_unset=True)
         if update_data.get("password"):
-            hashed_password = self.fake_password_hasher(update_data["password"])  # noqa: E501
+            hashed_password = get_password_hash(update_data["password"])
             del update_data["password"]
             update_data["hashed_password"] = hashed_password
         return super().update(db, db_obj=db_obj, obj_in=update_data)
