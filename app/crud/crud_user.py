@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional, Union
 
 from sqlalchemy.orm import Session
 
-from ..core.security import get_password_hash
+from ..core.security import get_password_hash, verify_password
 from ..crud.base import CRUDBase
 from ..models.user import User as UserModel
 from ..schemas.user import UserCreate, UserInDB, UserUpdate
@@ -48,6 +48,19 @@ class CRUDUser(CRUDBase[UserModel, UserCreate, UserUpdate]):
             del update_data["password"]
             update_data["hashed_password"] = hashed_password
         return super().update(db, db_obj=db_obj, obj_in=update_data)
+
+    def authenticate(
+        self,
+        db: Session,
+        username: str,
+        password: str
+    ) -> Optional[UserModel]:
+        user = self.get_by_username(db=db, username=username)
+        if not user:
+            return None
+        if not verify_password(password, user.hashed_password):
+            return None
+        return user
 
 
 user = CRUDUser(UserModel)
