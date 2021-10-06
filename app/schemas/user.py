@@ -34,3 +34,4 @@ class UserUpdate(BaseModel):
     email: Optional[str] = None
     full_name: Optional[str] = None
     password: str = Field(None, min_length=5, max_length=16)
+    is_active: bool = None

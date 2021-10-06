@@ -62,6 +62,9 @@ class CRUDUser(CRUDBase[UserModel, UserCreate, UserUpdate]):
             return None
         return user
 
+    def is_active(self, user: UserModel) -> bool:
+        return user.is_active
+
 
 user = CRUDUser(UserModel)
 
