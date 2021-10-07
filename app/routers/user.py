@@ -1,20 +1,34 @@
+from typing import Any, List
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from .. import crud
-from ..dependencies import get_db
+from ..dependencies import get_current_active_user, get_db
 from ..exceptions import NotFoundError
+from ..models.user import User as UserModel
 from ..schemas.user import User, UserCreate, UserUpdate
 
 router = APIRouter()
+
+
+@router.get("/", response_model=List[User])
+def get_users(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
+) -> Any:
+    users = crud.user.get_multi(db, skip=skip, limit=limit)
+    return users
 
 
 @router.get("/{username}", response_model=User)
 def get_user(
     username: str,
     db: Session = Depends(get_db)
-):
+) -> Any:
     db_user = crud.user.get_by_username(db=db, username=username)
     if db_user is None:
         raise NotFoundError(message="User not found")
@@ -25,7 +39,7 @@ def get_user(
 def create_user(
     user_in: UserCreate,
     db: Session = Depends(get_db)
-):
+) -> Any:
     db_user = crud.user.get_by_username(db=db, username=user_in.username)
     if db_user:
         return JSONResponse(
@@ -40,7 +54,7 @@ def update_user(
     username: str,
     user_in: UserUpdate,
     db: Session = Depends(get_db)
-):
+) -> Any:
     db_user = crud.user.get_by_username(db=db, username=username)
     if db_user is None:
         raise NotFoundError(message="User not found")
@@ -51,7 +65,7 @@ def update_user(
 def delete_user(
     username: str,
     db: Session = Depends(get_db)
-):
+) -> Any:
     db_user = crud.user.get_by_username(db=db, username=username)
     if db_user is None:
         raise NotFoundError(message="User not found")

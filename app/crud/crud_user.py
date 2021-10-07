@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from sqlalchemy.orm import Session
 
@@ -9,6 +9,11 @@ from ..schemas.user import UserCreate, UserInDB, UserUpdate
 
 
 class CRUDUser(CRUDBase[UserModel, UserCreate, UserUpdate]):
+
+    def get_multi(
+        self, db: Session, skip: int = 0, limit: int = 100
+    ) -> List[UserModel]:
+        return db.query(UserModel).offset(skip).limit(limit).all()
 
     def get_by_id(
         self, db: Session, user_id: int
@@ -67,7 +72,3 @@ class CRUDUser(CRUDBase[UserModel, UserCreate, UserUpdate]):
 
 
 user = CRUDUser(UserModel)
-
-
-def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(UserModel).offset(skip).limit(limit).all()
