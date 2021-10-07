@@ -8,6 +8,9 @@ from .. import crud
 from ..core.security import create_access_token
 from ..dependencies import get_db
 from ..schemas.token import Token
+from ..schemas.user import User
+from ..dependencies import get_current_user
+from ..models.user import User as UserModel
 
 router = APIRouter()
 
@@ -25,9 +28,19 @@ def login_access_token(
     )
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")  # noqa: E501
-    elif not crud.user.is_active(user):
-        raise HTTPException(status_code=401, detail="Inactive user")
+    # elif not crud.user.is_active(user):
+    #     raise HTTPException(status_code=401, detail="Inactive user")
     return {
         "access_token": create_access_token(sub=user.username),
         "token_type": "bearer",
     }
+
+
+@router.post("/login/test-token", response_model=User)
+def test_token(
+    current_user: UserModel = Depends(get_current_user)
+) -> Any:
+    """
+    Test access token
+    """
+    return current_user
