@@ -13,6 +13,14 @@ from ..schemas.user import User, UserCreate, UserUpdate
 router = APIRouter()
 
 
+@router.get("/me", response_model=User)
+def get_user_me(
+    current_user: UserModel = Depends(get_current_active_user)
+) -> Any:
+    """Get the current logged in user."""
+    return current_user
+
+
 @router.get("/", response_model=List[User])
 def get_users(
     skip: int = 0,
