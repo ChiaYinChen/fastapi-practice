@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from .db.sqlite import engine
+from .db.session import engine
 from .exceptions import NotFoundError, not_found_error_handler
 from .models import user as UserModel
 from .routers import login, user

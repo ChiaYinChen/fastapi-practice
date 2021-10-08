@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from . import crud
 from .core.config import settings
-from .db.sqlite import SessionLocal
+from .db.session import SessionLocal
 from .models.user import User as UserModel
 from .schemas.token import TokenPayload
 
