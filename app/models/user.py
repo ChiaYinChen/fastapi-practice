@@ -16,4 +16,4 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     full_name = Column(String(64), nullable=True)
     created_time = Column(DateTime, nullable=False, default=datetime.now)
-    is_active = Column(Boolean, default=True)
+    is_active = Column(Boolean, server_default=expression.true(), default=True)
