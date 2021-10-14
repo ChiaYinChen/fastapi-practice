@@ -24,6 +24,7 @@ class User(UserBase):
 
     user_id: int
     is_active: bool
+    is_superuser: bool
 
     class Config:
         orm_mode = True

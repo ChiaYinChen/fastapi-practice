@@ -5,7 +5,11 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from .. import crud
-from ..dependencies import get_current_active_user, get_db
+from ..dependencies import (
+    get_current_active_superuser,
+    get_current_active_user,
+    get_db,
+)
 from ..exceptions import NotFoundError
 from ..models.user import User as UserModel
 from ..schemas.user import User, UserCreate, UserUpdate
@@ -26,7 +30,7 @@ def get_users(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_active_user),
+    current_user: UserModel = Depends(get_current_active_superuser),
 ) -> Any:
     users = crud.user.get_multi(db, skip=skip, limit=limit)
     return users

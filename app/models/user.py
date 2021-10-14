@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from sqlalchemy.sql import expression
 
 from ..db.base_class import Base
 
@@ -16,4 +17,5 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     full_name = Column(String(64), nullable=True)
     created_time = Column(DateTime, nullable=False, default=datetime.now)
-    is_active = Column(Boolean, default=True)
+    is_active = Column(Boolean, server_default=expression.true(), default=True)
+    is_superuser = Column(Boolean, server_default=expression.false(), default=False)  # noqa: E501
