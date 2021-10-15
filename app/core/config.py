@@ -1,4 +1,7 @@
-from pydantic import BaseSettings
+from typing import Any, Dict, Optional
+
+from pydantic import BaseSettings, validator
+from sqlalchemy.engine.url import URL
 
 
 class Settings(BaseSettings):
@@ -7,7 +10,32 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
-    SQLALCHEMY_DATABASE_URI: str = "sqlite:///./app/demo.db"
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str = 'pgsql_db'
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DB: str
+    SQLALCHEMY_DATABASE_URI: Optional[str] = None
+
+    @validator("SQLALCHEMY_DATABASE_URI", pre=True)
+    def assemble_db_connection(
+        cls, v: Optional[str], values: Dict[str, Any]
+    ) -> Any:
+        if isinstance(v, str):
+            return v
+        postgres_db = {
+            'drivername': 'postgresql',
+            'username': values.get("POSTGRES_USER"),
+            'password': values.get("POSTGRES_PASSWORD"),
+            'host': values.get("POSTGRES_HOST"),
+            'port': values.get("POSTGRES_PORT"),
+            'database': values.get("POSTGRES_DB")
+        }
+        return str(URL(**postgres_db))
+
+    class Config:
+        env_file = './env/.prod.env'
+        case_sensitive = True
 
 
 settings = Settings()
