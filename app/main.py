@@ -5,7 +5,7 @@ from .exceptions import NotFoundError, not_found_error_handler
 from .models import user as UserModel
 from .routers import login, user
 
-# https://stackoverflow.com/a/68383073
+# create all tables that do not already exist
 UserModel.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
