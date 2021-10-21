@@ -31,7 +31,7 @@ class Settings(BaseSettings):
             'port': values.get("POSTGRES_PORT"),
             'database': values.get("POSTGRES_DB")
         }
-        return str(URL(**postgres_db))
+        return str(URL.create(**postgres_db))
 
     TEST_USER_EMAIL: str = "test@example.com"
     TEST_USER_USERNAME: str = "testuser"
