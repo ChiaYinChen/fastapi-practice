@@ -33,6 +33,10 @@ class Settings(BaseSettings):
         }
         return str(URL(**postgres_db))
 
+    TEST_USER_EMAIL: str = "test@example.com"
+    TEST_USER_USERNAME: str = "testuser"
+    TEST_USER_PASSWORD: str = "testuserpass"
+
     class Config:
         env_file = './env/.prod.env'
         case_sensitive = True
