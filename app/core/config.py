@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     TEST_USER_EMAIL: str = "test@example.com"
     TEST_USER_USERNAME: str = "testuser"
     TEST_USER_PASSWORD: str = "testuserpass"
+    FIRST_SUPERUSER: str
+    FIRST_SUPERUSER_PASSWORD: str
+    FIRST_SUPERUSER_EMAIL: str = "testsuper@example.com"
 
     class Config:
         env_file = './env/.prod.env'

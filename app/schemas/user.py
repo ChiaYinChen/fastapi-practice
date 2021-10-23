@@ -8,6 +8,8 @@ class UserBase(BaseModel):
     username: str
     email: str
     full_name: Optional[str] = None
+    is_active: Optional[bool] = True
+    is_superuser: Optional[bool] = False
 
 
 class UserCreate(UserBase):
@@ -35,4 +37,5 @@ class UserUpdate(BaseModel):
     email: Optional[str] = None
     full_name: Optional[str] = None
     password: str = Field(None, min_length=5, max_length=16)
-    is_active: bool = None
+    is_active: Optional[bool] = None
+    is_superuser: Optional[bool] = None
