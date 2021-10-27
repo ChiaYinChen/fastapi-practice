@@ -10,7 +10,8 @@ from app import color_formatter
 from app.core.config import settings
 from app.db.session import SessionLocal
 from app.main import app
-from .utils.user import authentication_token_from_username
+from .utils.user import (authentication_token_from_username,
+                         user_authentication_headers)
 
 
 @pytest.fixture(scope="session")
@@ -27,13 +28,28 @@ def client() -> Generator:
 
 
 @pytest.fixture(scope="module")
+def superuser_token_headers(
+    client: TestClient,
+    db: Session
+) -> Dict[str, str]:
+    """Token headers for superuser."""
+    return user_authentication_headers(
+        client=client,
+        username=settings.FIRST_SUPERUSER,
+        password=settings.FIRST_SUPERUSER_PASSWORD
+    )
+
+
+@pytest.fixture(scope="module")
 def normal_user_token_headers(
     client: TestClient,
     db: Session
 ) -> Dict[str, str]:
     """Token headers for normal user."""
     return authentication_token_from_username(
-        client=client, username=settings.TEST_USER_USERNAME, db=db
+        client=client,
+        username=settings.TEST_USER_USERNAME,
+        db=db
     )
 
 
