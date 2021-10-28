@@ -58,3 +58,61 @@ def test_get_users_by_normal(
     all_users = r.json()
     assert r.status_code == 401
     assert all_users == {"detail": "The user doesn't have enough privileges"}
+
+
+def test_get_user(
+    client: TestClient
+) -> None:
+    """Test get_user (existing user)."""
+    r = client.get(f"/user/{settings.TEST_USER_USERNAME}")
+    api_user = r.json()
+    assert r.status_code == 200
+    assert isinstance(api_user, dict)
+    assert api_user["username"] == settings.TEST_USER_USERNAME
+    assert api_user["email"] == settings.TEST_USER_EMAIL
+
+
+def test_get_user_not_exist(
+    client: TestClient
+) -> None:
+    """Test get_user (user not exist)."""
+    r = client.get("/user/not_exist_user")
+    api_user = r.json()
+    assert r.status_code == 404
+    assert api_user == {"message": "User not found"}
+
+
+def test_create_exist_user(
+    client: TestClient
+) -> None:
+    """Test create_user (existing user)."""
+    data = {
+        "username": settings.TEST_USER_USERNAME,
+        "email": settings.TEST_USER_EMAIL,
+        "password": settings.TEST_USER_PASSWORD
+    }
+    r = client.post("/user/", json=data)
+    created_user = r.json()
+    assert r.status_code == 400
+    assert created_user == {"message": "User already exist"}
+
+
+def test_update_user_not_exist(
+    client: TestClient
+) -> None:
+    """Test update_user (user not exist)."""
+    data = {"email": "not_found@example.com"}
+    r = client.patch("/user/not_exist_user", json=data)
+    created_user = r.json()
+    assert r.status_code == 404
+    assert created_user == {"message": "User not found"}
+
+
+def test_delete_user_not_exist(
+    client: TestClient
+) -> None:
+    """Test delete_user (user not exist)."""
+    r = client.delete("/user/not_exist_user")
+    created_user = r.json()
+    assert r.status_code == 404
+    assert created_user == {"message": "User not found"}
