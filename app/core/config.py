@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    POSTGRES_HOST: str = 'pgsql_db'
+    POSTGRES_HOST: str = "pgsql_db"
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str
     SQLALCHEMY_DATABASE_URI: Optional[str] = None
@@ -27,12 +27,12 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         postgres_db = {
-            'drivername': 'postgresql',
-            'username': values.get("POSTGRES_USER"),
-            'password': values.get("POSTGRES_PASSWORD"),
-            'host': values.get("POSTGRES_HOST"),
-            'port': values.get("POSTGRES_PORT"),
-            'database': values.get("POSTGRES_DB")
+            "drivername": "postgresql",
+            "username": values.get("POSTGRES_USER"),
+            "password": values.get("POSTGRES_PASSWORD"),
+            "host": values.get("POSTGRES_HOST"),
+            "port": values.get("POSTGRES_PORT"),
+            "database": values.get("POSTGRES_DB")
         }
         return str(URL.create(**postgres_db))
 
@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_EMAIL: str = "testsuper@example.com"
 
     class Config:
-        env_file = './env/.prod.env'
+        env_file = "./env/.prod.env"
         case_sensitive = True
 
 
@@ -52,5 +52,5 @@ settings = Settings()
 
 # logging setting
 PROJ_ROOT = dirname(dirname(dirname(abspath(__file__))))
-LOG_FILE_PATH = join(PROJ_ROOT, 'app', 'logging.conf')
+LOG_FILE_PATH = join(PROJ_ROOT, "app", "logging.conf")
 logging.config.fileConfig(LOG_FILE_PATH)
