@@ -1,0 +1,33 @@
+"""Login unit test."""
+from typing import Dict
+
+from fastapi.testclient import TestClient
+
+from app.core.config import settings
+
+
+def test_get_access_token(
+    client: TestClient
+) -> None:
+    """Test output format for `/login/access-token` endpoint."""
+    login_data = {
+        "username": settings.FIRST_SUPERUSER,
+        "password": settings.FIRST_SUPERUSER_PASSWORD,
+    }
+    r = client.post("/login/access-token", data=login_data)
+    tokens = r.json()
+    assert r.status_code == 200
+    assert "access_token" in tokens
+    assert tokens["token_type"] == "bearer"
+
+
+def test_use_access_token(
+    client: TestClient,
+    superuser_token_headers: Dict[str, str]
+) -> None:
+    """Test output format for `/login/test-token` endpoint."""
+    r = client.post("/login/test-token", headers=superuser_token_headers)
+    result = r.json()
+    assert r.status_code == 200
+    assert isinstance(result, dict)
+    assert "user_id" in result
