@@ -15,7 +15,7 @@ def test_get_user_me_by_normal(
     normal_user_token_headers: Dict[str, str]
 ) -> None:
     """Test get_user_me with normal user."""
-    r = client.get("/user/me", headers=normal_user_token_headers)
+    r = client.get("/users/me", headers=normal_user_token_headers)
     current_user = r.json()
     assert current_user["is_active"] is True
     assert current_user["is_superuser"] is False
@@ -28,7 +28,7 @@ def test_get_user_me_by_superuser(
     superuser_token_headers: Dict[str, str]
 ) -> None:
     """Test get_user_me with superuser."""
-    r = client.get("/user/me", headers=superuser_token_headers)
+    r = client.get("/users/me", headers=superuser_token_headers)
     current_user = r.json()
     assert current_user["is_active"] is True
     assert current_user["is_superuser"] is True
@@ -41,7 +41,7 @@ def test_get_users_by_superuser(
     superuser_token_headers: Dict[str, str]
 ) -> None:
     """Test get_users with superuser."""
-    r = client.get("/user/?skip=0&limit=100", headers=superuser_token_headers)
+    r = client.get("/users/?skip=0&limit=100", headers=superuser_token_headers)
     all_users = r.json()
     logger.debug(f"Total get {len(all_users)} users.")
     assert r.status_code == 200
@@ -54,7 +54,7 @@ def test_get_users_by_normal(
     normal_user_token_headers: Dict[str, str]
 ) -> None:
     """Test get_users with normal user."""
-    r = client.get("/user/?skip=0&limit=100", headers=normal_user_token_headers)  # noqa: E501
+    r = client.get("/users/?skip=0&limit=100", headers=normal_user_token_headers)  # noqa: E501
     all_users = r.json()
     assert r.status_code == 401
     assert all_users == {"detail": "The user doesn't have enough privileges"}
@@ -64,7 +64,7 @@ def test_get_user(
     client: TestClient
 ) -> None:
     """Test get_user (existing user)."""
-    r = client.get(f"/user/{settings.TEST_USER_USERNAME}")
+    r = client.get(f"/users/{settings.TEST_USER_USERNAME}")
     api_user = r.json()
     assert r.status_code == 200
     assert isinstance(api_user, dict)
@@ -76,7 +76,7 @@ def test_get_user_not_exist(
     client: TestClient
 ) -> None:
     """Test get_user (user not exist)."""
-    r = client.get("/user/not_exist_user")
+    r = client.get("/users/not_exist_user")
     api_user = r.json()
     assert r.status_code == 404
     assert api_user == {"message": "User not found"}
@@ -91,7 +91,7 @@ def test_create_exist_user(
         "email": settings.TEST_USER_EMAIL,
         "password": settings.TEST_USER_PASSWORD
     }
-    r = client.post("/user/", json=data)
+    r = client.post("/users/", json=data)
     created_user = r.json()
     assert r.status_code == 400
     assert created_user == {"message": "User already exist"}
@@ -102,7 +102,7 @@ def test_update_user_not_exist(
 ) -> None:
     """Test update_user (user not exist)."""
     data = {"email": "not_found@example.com"}
-    r = client.patch("/user/not_exist_user", json=data)
+    r = client.patch("/users/not_exist_user", json=data)
     created_user = r.json()
     assert r.status_code == 404
     assert created_user == {"message": "User not found"}
@@ -112,7 +112,7 @@ def test_delete_user_not_exist(
     client: TestClient
 ) -> None:
     """Test delete_user (user not exist)."""
-    r = client.delete("/user/not_exist_user")
+    r = client.delete("/users/not_exist_user")
     created_user = r.json()
     assert r.status_code == 404
     assert created_user == {"message": "User not found"}

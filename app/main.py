@@ -10,7 +10,7 @@ UserModel.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-app.include_router(user.router, prefix="/user", tags=["user"])
+app.include_router(user.router, prefix="/users", tags=["users"])
 app.include_router(login.router, tags=["login"])
 
 app.add_exception_handler(NotFoundError, not_found_error_handler)
