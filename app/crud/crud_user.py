@@ -1,3 +1,4 @@
+"""CRUD for user."""
 from typing import Any, Dict, List, Optional, Union
 
 from sqlalchemy.orm import Session
@@ -9,25 +10,30 @@ from ..schemas.user import UserCreate, UserInDB, UserUpdate
 
 
 class CRUDUser(CRUDBase[UserModel, UserCreate, UserUpdate]):
+    """CRUD for user."""
 
     def get_multi(
         self, db: Session, skip: int = 0, limit: int = 100
     ) -> List[UserModel]:
+        """Filter user list using skip and limit parameters."""
         return db.query(UserModel).offset(skip).limit(limit).all()
 
     def get_by_id(
         self, db: Session, user_id: int
     ) -> Optional[UserModel]:
+        """Get user by id."""
         return db.query(UserModel).filter(UserModel.id == user_id).first()
 
     def get_by_username(
         self, db: Session, username: str
     ) -> Optional[UserModel]:
+        """Get user by username."""
         return db.query(UserModel).filter(UserModel.username == username).first()  # noqa: E501
 
     def create(
         self, db: Session, obj_in: UserCreate
     ) -> UserModel:
+        """Create user by username, email and password."""
         hashed_password = get_password_hash(obj_in.password)
         user_in_db = UserInDB(
             **obj_in.dict(), hashed_password=hashed_password
@@ -44,6 +50,7 @@ class CRUDUser(CRUDBase[UserModel, UserCreate, UserUpdate]):
         db_obj: UserModel,
         obj_in: Union[UserUpdate, Dict[str, Any]]
     ) -> UserModel:
+        """Update user."""
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
@@ -60,6 +67,7 @@ class CRUDUser(CRUDBase[UserModel, UserCreate, UserUpdate]):
         username: str,
         password: str
     ) -> Optional[UserModel]:
+        """Authenticate a user."""
         user = self.get_by_username(db=db, username=username)
         if not user:
             return None
@@ -68,9 +76,11 @@ class CRUDUser(CRUDBase[UserModel, UserCreate, UserUpdate]):
         return user
 
     def is_active(self, user: UserModel) -> bool:
+        """Check if user is active."""
         return user.is_active
 
     def is_superuser(self, user: UserModel) -> bool:
+        """Check if user is superuser."""
         return user.is_superuser
 
 
