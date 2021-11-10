@@ -1,10 +1,11 @@
+"""Schema for User."""
 from typing import Optional
 
 from pydantic import BaseModel, Field
 
 
 class UserBase(BaseModel):
-
+    """Base User schema."""
     username: str
     email: str
     full_name: Optional[str] = None
@@ -13,17 +14,17 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-
+    """Create input."""
     password: str = Field(..., min_length=5, max_length=16)
 
 
 class UserInDB(UserBase):
-
+    """To db."""
     hashed_password: str
 
 
 class User(UserBase):
-
+    """Output."""
     user_id: int
     is_active: bool
     is_superuser: bool
@@ -33,7 +34,7 @@ class User(UserBase):
 
 
 class UserUpdate(BaseModel):
-
+    """Update input."""
     email: Optional[str] = None
     full_name: Optional[str] = None
     password: str = Field(None, min_length=5, max_length=16)

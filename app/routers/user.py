@@ -1,3 +1,4 @@
+"""Router for user."""
 from typing import Any, List
 
 from fastapi import APIRouter, Depends
@@ -32,6 +33,7 @@ def get_users(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_active_superuser),
 ) -> Any:
+    """Get user list."""
     users = crud.user.get_multi(db, skip=skip, limit=limit)
     return users
 
@@ -41,6 +43,7 @@ def get_user(
     username: str,
     db: Session = Depends(get_db)
 ) -> Any:
+    """Get user detail information."""
     db_user = crud.user.get_by_username(db=db, username=username)
     if db_user is None:
         raise NotFoundError(message="User not found")
@@ -52,6 +55,7 @@ def create_user(
     user_in: UserCreate,
     db: Session = Depends(get_db)
 ) -> Any:
+    """Create a user."""
     db_user = crud.user.get_by_username(db=db, username=user_in.username)
     if db_user:
         return JSONResponse(
@@ -67,6 +71,7 @@ def update_user(
     user_in: UserUpdate,
     db: Session = Depends(get_db)
 ) -> Any:
+    """Update user."""
     db_user = crud.user.get_by_username(db=db, username=username)
     if db_user is None:
         raise NotFoundError(message="User not found")
@@ -78,6 +83,7 @@ def delete_user(
     username: str,
     db: Session = Depends(get_db)
 ) -> Any:
+    """Delete user."""
     db_user = crud.user.get_by_username(db=db, username=username)
     if db_user is None:
         raise NotFoundError(message="User not found")
